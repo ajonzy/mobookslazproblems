@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="books.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="header">
+            <a class="logo" href="index.html">
+                <img src="mo_books_laz_problems_logo.png" alt="">
+            </a>
+    
+            <div class="options">
+                <a href="signup.html">Sign Up</a>
+                <a href="login.html">Login</a>
+            </div>
+        </div>
+    
+        <div class="content">
+            <form onsubmit="handleSubmit(event)">
+                <input id="title-input" type="text" placeholder="Title">
+                <input id="author-input" type="text" placeholder="Author">
+                <input id="review-input" type="text" placeholder="Review">
+                <label>Recommend?</label>
+                <input id="recommend-input" type="checkbox">
+                <button type="submit">Add Book</button>
+            </form>
+
+            <div class="books-wrapper"></div>
+        </div>
+    </div>
+</body>
+
+<script>
+    function getBooks() {
+        const url = new URL(document.URL)
+        const userId = url.searchParams.get("user")
+
+        fetch(`https://mobookslazproblems-api.herokuapp.com/book/get/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+
+            data.forEach(book => {
+                const bookWrapper = document.createElement("div")
+                bookWrapper.className = "book-wrapper"
+
+                const title = document.createElement("h2")
+                title.innerHTML = book.title
+
+                const author = document.createElement("h3")
+                author.innerHTML = book.author
+
+                const review = document.createElement("p")
+                review.innerHTML = book.review
+
+                const recommend = document.createElement("p")
+                recommend.innerHTML = book.recommend ? "Yes" : "No"
+
+                bookWrapper.appendChild(title)
+                bookWrapper.appendChild(author)
+                bookWrapper.appendChild(review)
+                bookWrapper.appendChild(recommend)
+
+                const wrapper = document.querySelector(".books-wrapper")
+                wrapper.appendChild(bookWrapper)
+            })
+        })
+        .catch(error => console.log(error))
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault()
+
+        const titleInput = document.getElementById("title-input")
+        const authorInput = document.getElementById("author-input")
+        const reviewInput = document.getElementById("review-input")
+        const recommendInput = document.getElementById("recommend-input")
+
+        const title = titleInput.value
+        const author = authorInput.value
+        const review = reviewInput.value
+        const recommend = recommendInput.checked
+
+        const url = new URL(document.URL)
+        const userId = url.searchParams.get("user")
+
+        fetch("https://mobookslazproblems-api.herokuapp.com/book/add", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                title: title,
+                author: author,
+                review: review,
+                recommend: recommend,
+                user_id: userId
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.log(error))
+    }
+
+    getBooks()
+</script>
+</html>

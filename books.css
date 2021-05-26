@@ -1,0 +1,9 @@
+.content form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content form input {
+    margin-bottom: 20px;
+}
